@@ -1,0 +1,154 @@
+---
+import Crest from './Crest.astro';
+import Ball from './Ball.astro';
+import { clanskeKarte, klub } from '../data/klub';
+
+const mail = (iznos: number) =>
+  `mailto:${klub.email}?subject=${encodeURIComponent(`Članska karta ${iznos} KM – sezona ${klub.sezona}`)}`;
+---
+
+<section class="kt" id="karte">
+  <div class="sparkles" aria-hidden="true">
+    {Array.from({ length: 14 }).map((_, i) => (
+      <span style={`--i:${i};left:${(i * 7.3) % 100}%;top:${10 + ((i * 37) % 80)}%;font-size:${10 + ((i * 7) % 18)}px`}>✦</span>
+    ))}
+  </div>
+
+  <div class="wrap grid">
+    <header class="copy">
+      <p class="eyebrow" data-reveal>Sezona {klub.sezona}</p>
+      <h2 class="display" data-reveal style="--d:.08s">Članske<br /><span class="stroke">karte</span></h2>
+      <span class="oval" data-reveal="zoom" style="--d:.2s">u prodaji!</span>
+      <p class="lead" data-reveal style="--d:.24s">
+        Kupovinom članske karte ne pružate samo podršku klubu — postajete dio naše priče, naše ekipe i
+        sezone koja je pred nama. Dostupne su u iznosima od 20, 50 i 100 KM, da svako može podržati klub
+        u skladu sa svojim mogućnostima.
+      </p>
+      <p class="motto script" data-reveal style="--d:.3s">Jedan klub. Jedna porodica. ❤</p>
+      <a href={mail(20)} class="btn btn--dark" data-reveal style="--d:.36s">Javi nam se za kartu <span class="arr">→</span></a>
+    </header>
+
+    <div class="deck">
+      {clanskeKarte.map((k, i) => (
+        <a href={mail(k.iznos)} class={`card card--${k.motiv}`} style={`--n:${i}`} data-tilt="14" aria-label={`Članska karta ${k.iznos} KM`}>
+          <span class="holo" aria-hidden="true"></span>
+          <span class="card-top">
+            <span class="brand">
+              <span class="display">ŽOK Željezara</span>
+              <small>Zenica · Superliga OSFBiH</small>
+            </span>
+            <Crest size={52} />
+          </span>
+          <span class="chip"><Ball size={34} /></span>
+          <span class="motto2 script">Jedan klub, jedna porodica</span>
+          <span class="words">Tim · Snaga · Tradicija · Zenica</span>
+          <span class="card-bottom">
+            <span class="lbl">
+              <small>Članska karta · {klub.sezona}</small>
+              <b>{k.naziv}</b>
+            </span>
+            <span class="amt display">{k.iznos}<small>KM</small></span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .kt {
+    position: relative;
+    padding: clamp(90px, 12vw, 150px) 0;
+    background:
+      radial-gradient(circle at 80% 20%, #fff 0, transparent 35%),
+      radial-gradient(circle at 10% 90%, var(--pink-soft) 0, transparent 45%),
+      linear-gradient(160deg, #ffd3e6, #ff9ec8);
+    color: var(--wine);
+    overflow: hidden;
+  }
+  .sparkles span {
+    position: absolute;
+    color: #fff;
+    opacity: 0;
+    animation: twinkle 3.2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.37s);
+  }
+  @keyframes twinkle { 50% { opacity: 0.9; transform: scale(1.3) rotate(45deg); } }
+
+  .grid { position: relative; display: grid; grid-template-columns: 1fr 1.15fr; gap: 60px; align-items: center; }
+  .copy { display: grid; justify-items: start; gap: 16px; }
+  .copy .eyebrow { color: var(--red); }
+  .copy h2 { font-size: clamp(3.6rem, 9vw, 7.6rem); color: var(--wine); }
+  .copy h2 .stroke { --sc: var(--wine); }
+  .copy .oval { color: var(--pink); background: #fff; border-color: #fff; margin-top: -6px; }
+  .lead { max-width: 48ch; font-size: 1.02rem; }
+  .motto { font-size: 2rem; color: var(--red); }
+
+  /* Špil kartica */
+  .deck { position: relative; height: clamp(380px, 46vw, 520px); }
+  .card {
+    --w: min(100%, 440px);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--w);
+    aspect-ratio: 1.586;
+    border-radius: 22px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--wine);
+    background: linear-gradient(135deg, #fff5fa, #ffc7e0 55%, #ff9fcb);
+    box-shadow: 0 30px 60px -25px rgba(87, 17, 41, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    translate: -50% -50%;
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate(var(--tx), var(--ty)) rotate(var(--rot));
+    transition: transform 0.6s var(--ease), box-shadow 0.4s;
+    z-index: calc(3 - var(--n));
+  }
+  .card--blush { --tx: 0px; --ty: 0px; --rot: -4deg; }
+  .card--hot { --tx: 40px; --ty: -70px; --rot: 6deg; color: #fff; background: linear-gradient(135deg, #ff6fb5, var(--pink) 45%, #c4005e); }
+  .card--wine { --tx: -30px; --ty: -130px; --rot: -11deg; color: var(--cream); background: linear-gradient(135deg, var(--wine-3), var(--wine) 50%, var(--ink)); }
+  .deck:hover .card--blush { --ty: 110px; --rot: -2deg; }
+  .deck:hover .card--hot { --tx: 60px; --ty: -10px; --rot: 4deg; }
+  .deck:hover .card--wine { --tx: -50px; --ty: -140px; --rot: -6deg; }
+  .card:hover { z-index: 5; box-shadow: 0 40px 70px -25px rgba(255, 46, 139, 0.7); }
+
+  .holo {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.65) 40%, rgba(255, 184, 214, 0.5) 46%, rgba(180, 230, 255, 0.4) 52%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: calc(var(--mx, 0%) * 1.2) 0;
+    mix-blend-mode: soft-light;
+    animation: sheen 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .card:hover .holo { animation: none; }
+  @keyframes sheen { 0%, 100% { background-position: 120% 0; } 50% { background-position: -20% 0; } }
+
+  .card-top { position: relative; display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { display: grid; line-height: 1; }
+  .brand .display { font-size: clamp(1.5rem, 3vw, 2rem); }
+  .brand small { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.8; margin-top: 4px; }
+  .chip { position: relative; margin-top: 10px; width: 46px; height: 36px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(135deg, #ffe3a3, #e6b45c); }
+  .chip :global(svg) { width: 26px; height: 26px; }
+  .motto2 { position: relative; margin-top: auto; font-size: clamp(1.3rem, 2.6vw, 1.7rem); }
+  .card--blush .motto2 { color: var(--pink); }
+  .card--wine .motto2 { color: var(--pink); }
+  .words { position: relative; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.7; }
+  .card-bottom { position: relative; display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px dashed currentColor; border-top-color: color-mix(in srgb, currentColor 35%, transparent); }
+  .lbl { display: grid; line-height: 1.15; }
+  .lbl small { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.75; }
+  .lbl b { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .amt { font-size: clamp(2.6rem, 5vw, 3.4rem); line-height: 0.85; }
+  .amt small { font-size: 0.4em; margin-left: 4px; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; gap: 30px; }
+    .deck { height: auto; display: grid; gap: 16px; }
+    .card { position: relative; left: auto; top: auto; translate: none; --tx: 0px; --ty: 0px; --rot: 0deg; width: 100%; max-width: 440px; justify-self: center; }
+    .deck:hover .card { --tx: 0px; --ty: 0px; --rot: 0deg; }
+  }
+</style>

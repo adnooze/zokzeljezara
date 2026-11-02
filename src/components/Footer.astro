@@ -1,0 +1,60 @@
+---
+import Crest from './Crest.astro';
+import { klub } from '../data/klub';
+const year = 2026;
+---
+
+<footer class="ft">
+  <div class="huge" aria-hidden="true">
+    <div class="track">
+      {[0, 1].map(() => <span class="display">Željezara ✦ Zenica ✦&nbsp;</span>)}
+    </div>
+  </div>
+  <div class="wrap row">
+    <div class="brand">
+      <Crest size={54} />
+      <div>
+        <b class="display">{klub.ime}</b>
+        <small>{klub.liga} · {klub.sezona}</small>
+      </div>
+    </div>
+    <nav aria-label="Podnožje">
+      <a href="#tim">Tim</a>
+      <a href="#rezultati">Rezultati</a>
+      <a href="#raspored">Raspored</a>
+      <a href="#karte">Članske karte</a>
+      <a href={klub.instagram} target="_blank" rel="noopener">Instagram</a>
+    </nav>
+    <p class="copy">© {year} ŽOK „Željezara“ Zenica · Jedan klub. Jedna porodica.</p>
+  </div>
+</footer>
+
+<style>
+  .ft { background: var(--ink); padding: 0 0 36px; overflow: hidden; }
+  .huge { padding: 30px 0 10px; }
+  .track { display: flex; width: max-content; animation: run 40s linear infinite; }
+  .track span {
+    font-size: clamp(5rem, 16vw, 14rem);
+    line-height: 1;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--wine-3);
+    transition: -webkit-text-stroke-color 0.5s;
+  }
+  .huge:hover .track span { -webkit-text-stroke-color: var(--pink); }
+  @keyframes run { to { transform: translateX(-50%); } }
+
+  .row { display: grid; grid-template-columns: auto 1fr; gap: 24px 40px; align-items: center; padding-top: 30px; border-top: 1px solid rgba(255, 184, 214, 0.12); }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand b { display: block; font-size: 1.3rem; }
+  .brand small { font-size: 0.72rem; color: var(--pink-soft); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+  nav { display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: flex-end; }
+  nav a { font-weight: 700; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; transition: opacity 0.3s, color 0.3s; }
+  nav a:hover { opacity: 1; color: var(--pink); }
+  .copy { grid-column: 1 / -1; font-size: 0.78rem; opacity: 0.5; }
+
+  @media (max-width: 760px) {
+    .row { grid-template-columns: 1fr; }
+    nav { justify-content: flex-start; }
+  }
+</style>

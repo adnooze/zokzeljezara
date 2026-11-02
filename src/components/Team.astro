@@ -1,0 +1,376 @@
+---
+import { igracice, opisPozicije, strucniStab, klub, type Pozicija } from '../data/klub';
+
+const filteri: { key: Pozicija | 'sve'; label: string }[] = [
+  { key: 'sve', label: 'Sve' },
+  { key: 'Primač', label: 'Primači' },
+  { key: 'Srednji bloker', label: 'Srednji blokeri' },
+  { key: 'Tehničar', label: 'Tehničari' },
+  { key: 'Korektor', label: 'Korektori' },
+  { key: 'Libero', label: 'Liberi' },
+];
+// Igračice nose crvene dresove, pa kartice idu naizmjenično roza / tamno vinska
+const motivi = ['pink', 'dark'] as const;
+---
+
+<section class="team" id="tim">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow pink" data-reveal>Predstavljanje igračica · Sezona {klub.sezona}</p>
+      <h2 class="display" data-reveal style="--d:.08s">Upoznaj <span class="stroke">našu</span> <span class="pink">ekipu</span></h2>
+      <div class="sub" data-reveal style="--d:.16s">
+        <p class="lead">
+          Igračice koje ove sezone brane boje kluba u Superligi OSFBiH. Zajedno na terenu, zajedno do
+          novih bodova, zajedno do cilja!
+        </p>
+        <span class="oval pink">#zokice ❤</span>
+      </div>
+    </header>
+
+    <div class="filters" role="tablist" aria-label="Filtriraj po poziciji" data-reveal>
+      {filteri.map((f, i) => (
+        <button role="tab" class="chip" data-filter={f.key} aria-selected={i === 0 ? 'true' : 'false'}>
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <div class="grid">
+      {igracice.map((p, i) => {
+        const motiv = p.kapiten ? 'pink' : motivi[i % 2];
+        return (
+          <article
+            class={`pc pc--${motiv} ${p.kapiten ? 'pc--cap' : ''} ${p.foto ? 'pc--photo' : ''}`}
+            data-pos={p.pozicija}
+            data-reveal
+            style={`--d:${(i % 4) * 0.08}s`}
+          >
+            <div class="pc-in" data-tilt="12">
+              {p.foto && (
+                <>
+                  <img class="pc-img" src={p.foto} alt={`${p.ime} ${p.prezime}, #${p.broj}`} loading="lazy" decoding="async" />
+                  <span class="pc-fade" aria-hidden="true"></span>
+                </>
+              )}
+              <span class="pc-num display" aria-hidden="true">{p.broj}</span>
+              <span class="pc-pos">{p.pozicija}</span>
+              {p.kapiten && <span class="pc-cap">★ Kapiten</span>}
+
+              <div class="pc-visual">
+                {!p.foto && (
+                  <svg viewBox="0 0 200 200" class="jersey" aria-hidden="true">
+                    <path class="j-body" d="M62 30l-40 22 14 36 18-8v94h92V80l18 8 14-36-40-22c-6 12-20 20-38 20s-32-8-38-20z" />
+                    <path class="j-trim" d="M62 30c6 12 20 20 38 20s32-8 38-20" />
+                    <path class="j-stripe" d="M54 120h92v10H54z" />
+                    <text x="100" y="118" text-anchor="middle" class="j-num">{p.broj}</text>
+                  </svg>
+                )}
+              </div>
+
+              <div class="pc-name">
+                <span class="last display">{p.prezime}</span>
+                <span class="first script">{p.ime}</span>
+              </div>
+
+              <div class="pc-bio">
+                <p class="eyebrow">#{p.broj} · {p.pozicija}</p>
+                <p>{p.kapiten ? 'Kapiten ekipe — vodi djevojke na terenu i van njega. ' : ''}{opisPozicije[p.pozicija]}</p>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+      <div class="closer" data-reveal>
+        <p class="display"><span data-count={igracice.length}>0</span> igračica.<br /><span class="stroke">Jedan cilj.</span></p>
+        <p class="script">zajedno na terenu, zajedno do novih bodova ❤</p>
+      </div>
+    </div>
+
+    <div class="staff">
+      <h3 class="display" data-reveal>Stručni <span class="pink">štab</span></h3>
+      <div class="staff-grid">
+        {strucniStab.map((s, i) => (
+          <article class="st" data-reveal={i ? 'right' : 'left'}>
+            <span class="st-ico display" aria-hidden="true">{s.ime[0]}{s.prezime[0]}</span>
+            <div>
+              <p class="eyebrow pink">{s.uloga}</p>
+              <p class="st-name display">{s.ime} <span class="stroke">{s.prezime}</span></p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.filters .chip');
+  const cards = document.querySelectorAll<HTMLElement>('.team .pc');
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.setAttribute('aria-selected', String(c === chip)));
+      const f = chip.dataset.filter;
+      cards.forEach((card, i) => {
+        const show = f === 'sve' || card.dataset.pos === f;
+        card.classList.toggle('is-hidden', !show);
+        if (show) {
+          card.classList.remove('pop');
+          void card.offsetWidth;
+          card.style.setProperty('--pd', `${(i % 4) * 60}ms`);
+          card.classList.add('pop');
+        }
+      });
+    })
+  );
+</script>
+
+<style>
+  .team {
+    position: relative;
+    padding: clamp(100px, 13vw, 170px) 0 clamp(80px, 10vw, 130px);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(227, 36, 43, 0.35), transparent 40%),
+      radial-gradient(circle at 0% 60%, rgba(255, 46, 139, 0.18), transparent 40%),
+      var(--wine);
+  }
+  .sec-head .stroke { --sc: var(--cream); }
+  .sub { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+  .chip {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 184, 214, 0.35);
+    font-weight: 800;
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.3s var(--ease);
+  }
+  .chip:hover { transform: translateY(-2px); border-color: var(--pink); }
+  .chip[aria-selected='true'] { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .pc { min-width: 0; }
+  .pc.is-hidden { display: none; }
+  .pc.pop { animation: cardPop 0.6s var(--ease) var(--pd, 0ms) both; }
+  @keyframes cardPop { from { opacity: 0; transform: translateY(30px) scale(0.92); } }
+  .pc--cap { grid-column: span 2; grid-row: span 2; }
+
+  .pc-in {
+    --bg1: var(--red);
+    --bg2: var(--red-deep);
+    --jersey: var(--ink);
+    --jtrim: var(--red);
+    --jnum: #fff;
+    position: relative;
+    height: 100%;
+    min-height: 360px;
+    border-radius: 24px;
+    padding: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    background:
+      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 14px),
+      linear-gradient(165deg, var(--bg1), var(--bg2));
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.25s ease-out, box-shadow 0.4s var(--ease);
+    box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.7);
+  }
+  .pc-in::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.28), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .pc-in:hover { box-shadow: 0 34px 60px -24px rgba(255, 46, 139, 0.55); }
+  .pc-in:hover::after { opacity: 1; }
+  .pc--pink .pc-in { --bg1: var(--pink-hot); --bg2: #c8005f; --jersey: var(--pink-soft); --jtrim: var(--wine); --jnum: var(--wine); }
+  .pc--dark .pc-in { --bg1: var(--wine-3); --bg2: var(--ink); --jersey: var(--red); --jtrim: var(--ink); --jnum: #fff; }
+
+  .pc-num {
+    position: absolute;
+    top: -0.08em;
+    right: 0.06em;
+    font-size: 8.5rem;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.5);
+    transition: transform 0.6s var(--ease), color 0.4s;
+  }
+  .pc-in:hover .pc-num { transform: translateY(8px) scale(1.06); color: rgba(255, 255, 255, 0.16); }
+  .pc-pos {
+    position: relative;
+    align-self: flex-start;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--wine);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .pc-cap {
+    position: relative;
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--wine);
+    color: var(--pink-soft);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .pc-visual { flex: 1; display: grid; place-items: center; padding: 6px 10px; }
+
+  /* Kartica sa fotografijom */
+  .pc--photo .pc-in { min-height: 420px; }
+  .pc--photo .pc-num { z-index: 0; color: rgba(255, 255, 255, 0.1); font-size: 11rem; right: -0.02em; }
+  .pc--photo.pc--cap .pc-num { font-size: 22rem; }
+  .pc-img {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    bottom: 0;
+    width: auto;
+    max-width: 135%;
+    height: 86%;
+    object-fit: contain;
+    object-position: bottom center;
+    translate: -50% 0;
+    filter: drop-shadow(0 16px 24px rgba(20, 3, 10, 0.45));
+    transform-origin: bottom center;
+    transition: transform 0.8s var(--ease), filter 0.6s;
+  }
+  .pc--cap .pc-img { height: 90%; }
+  .pc-in:hover .pc-img { transform: scale(1.06) translateY(-6px); filter: drop-shadow(0 26px 30px rgba(20, 3, 10, 0.55)) saturate(1.1); }
+  .pc-fade {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background: linear-gradient(to top, var(--bg2) 0%, color-mix(in srgb, var(--bg2) 80%, transparent) 18%, transparent 42%);
+    pointer-events: none;
+  }
+  .pc--photo .pc-pos,
+  .pc--photo .pc-cap,
+  .pc--photo .pc-name,
+  .pc--photo .pc-visual { z-index: 2; }
+  .pc--photo .pc-bio { z-index: 3; }
+  .pc--photo .pc-in::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 2px rgba(255, 184, 214, 0.18);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .pc--photo .pc-name .first { color: var(--pink-soft); }
+  .pc--photo.pc--pink .pc-name .first { color: #fff; }
+  .pc--photo .pc-name { text-shadow: 0 4px 18px rgba(20, 3, 10, 0.45); }
+  .jersey { width: 72%; max-width: 220px; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.35)); transition: transform 0.6s var(--ease); }
+  .pc--cap .jersey { width: 60%; max-width: 300px; }
+  .pc-in:hover .jersey { transform: translateY(-10px) rotate(-4deg) scale(1.04); }
+  .j-body { fill: var(--jersey); }
+  .j-trim { fill: none; stroke: var(--jtrim); stroke-width: 6; }
+  .j-stripe { fill: var(--jtrim); opacity: 0.8; }
+  .j-num { font-family: var(--f-display); font-size: 58px; fill: var(--jnum); }
+
+  .pc-name { position: relative; display: grid; line-height: 1; }
+  .last { font-size: clamp(1.7rem, 2.4vw, 2.2rem); word-break: break-word; }
+  .pc--cap .last { font-size: clamp(2.4rem, 5vw, 4.4rem); }
+  .first { font-size: 1.6rem; color: var(--pink-soft); margin-top: 2px; }
+  .pc--pink .first { color: var(--wine); }
+  .pc--cap .first { font-size: 2.3rem; }
+
+  .pc-bio {
+    position: absolute;
+    inset: auto 10px 10px 10px;
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(20, 3, 10, 0.88);
+    backdrop-filter: blur(8px);
+    color: var(--cream);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    transform: translateY(calc(100% + 14px));
+    transition: transform 0.5s var(--ease);
+  }
+  .pc-bio .eyebrow { color: var(--pink); margin-bottom: 6px; font-size: 0.66rem; }
+  .pc-in:hover .pc-bio,
+  .pc-in:focus-within .pc-bio { transform: none; }
+
+  .closer {
+    grid-column: span 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 30px clamp(20px, 4vw, 44px);
+    border-radius: 24px;
+    border: 2px dashed rgba(255, 184, 214, 0.35);
+    background: radial-gradient(circle at 100% 0%, rgba(255, 46, 139, 0.25), transparent 60%);
+  }
+  .closer .display { font-size: clamp(2.4rem, 5vw, 4.6rem); }
+  .closer .display span:first-child { color: var(--pink); }
+  .closer .stroke { --sc: var(--cream); }
+  .closer .script { font-size: 1.7rem; color: var(--pink-soft); }
+  .team:has(.pc.is-hidden) .closer { display: none; }
+
+  /* Stručni štab */
+  .staff { margin-top: clamp(70px, 9vw, 110px); }
+  .staff h3 { font-size: clamp(2.6rem, 6vw, 4.6rem); margin-bottom: 26px; }
+  .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .st {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 24px;
+    border-radius: 24px;
+    background: rgba(255, 247, 250, 0.05);
+    border: 1px solid rgba(255, 184, 214, 0.18);
+    transition: background 0.4s, transform 0.4s var(--ease);
+  }
+  .st:hover { background: rgba(255, 46, 139, 0.12); transform: translateY(-4px); }
+  .st-ico {
+    flex: none;
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--pink), var(--red));
+  }
+  .st-name { font-size: clamp(1.8rem, 3.2vw, 2.6rem); margin-top: 4px; }
+  .st-name .stroke { --sc: var(--cream); --sw: 1.5px; }
+
+  @media (max-width: 1000px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+    .closer { grid-column: span 1; padding: 20px; }
+    .closer .display { font-size: 2rem; }
+    .closer .script { font-size: 1.3rem; }
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .pc-in { min-height: 300px; padding: 14px; border-radius: 18px; }
+    .pc-num { font-size: 6rem; }
+    .last { font-size: 1.4rem; }
+    .first { font-size: 1.3rem; }
+    .staff-grid { grid-template-columns: 1fr; }
+    .pc-bio { font-size: 0.78rem; padding: 12px; }
+    .pc--photo .pc-in { min-height: 300px; }
+    .pc--photo:not(.pc--cap) .pc-img { height: auto; width: 118%; max-width: none; }
+    .pc--photo .pc-num { font-size: 7rem; }
+    .pc--photo.pc--cap .pc-num { font-size: 12rem; }
+  }
+</style>

@@ -1,0 +1,174 @@
+---
+import { nadolazece, odgodjene, inicijali } from '../data/klub';
+
+const ZOK = 'Željezara';
+const kratko = (n: string) => n.match(/„(.+)“/)?.[1] ?? n;
+const dijelovi = [
+  { naslov: 'Odgođeno', godina: '', lista: odgodjene },
+  { naslov: 'Jesenji dio', godina: '2026', lista: nadolazece.filter((u) => u.iso.startsWith('2026')) },
+  { naslov: 'Proljetni dio', godina: '2027', lista: nadolazece.filter((u) => u.iso.startsWith('2027')) },
+].filter((d) => d.lista.length);
+---
+
+<section class="sch" id="raspored">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow pink" data-reveal>Utakmice koje dolaze</p>
+      <h2 class="display" data-reveal style="--d:.08s">
+        <span class="stroke">Game</span><br />schedule
+      </h2>
+      <p class="lead" data-reveal style="--d:.16s">
+        Raspored utakmica ŽOK „Željezara“ Zenica u Superligi FBiH – Grupa Jug. Vaša podrška s tribina našim
+        djevojkama znači mnogo — vidimo se na utakmicama!
+      </p>
+    </header>
+
+    {dijelovi.map((d) => (
+      <div class="part">
+        <div class="part-head" data-reveal>
+          <h3 class="display">{d.naslov}</h3>
+          <span class="yr display">{d.godina}</span>
+          <span class="line"></span>
+          <span class="cnt">{d.lista.length} utakmica</span>
+        </div>
+
+        <ol class="list">
+          {d.lista.map((u, i) => {
+            const home = u.domaci ? ZOK : kratko(u.protivnik);
+            const away = u.domaci ? kratko(u.protivnik) : ZOK;
+            const isNext = u === nadolazece[0];
+            return (
+              <li class={`m ${isNext ? 'm--next' : ''}`} data-reveal={i % 2 ? 'right' : 'left'} style={`--d:${(i % 4) * 0.05}s`}>
+                <div class="m-date">
+                  <span class="m-kolo display">{u.kolo}</span>
+                  <span class="m-d">{u.datum}{u.vrijeme ? ` · ${u.vrijeme}` : ''}</span>
+                </div>
+                <div class="m-bar">
+                  <span class={`ban ban--l ${home === ZOK ? 'ban--us' : ''}`}>
+                    <i>{home === ZOK ? 'Ž' : inicijali(u.protivnik)}</i>{home}
+                  </span>
+                  <span class="m-vs display">vs</span>
+                  <span class={`ban ban--r ${away === ZOK ? 'ban--us' : ''}`}>
+                    {away}<i>{away === ZOK ? 'Ž' : inicijali(u.protivnik)}</i>
+                  </span>
+                </div>
+                <div class="m-where">
+                  <span class={`hg ${u.domaci ? 'hg--d' : ''}`}>{u.domaci ? 'Domaćin' : 'Gost'}</span>
+                  <span class="m-place">{u.dvorana ?? u.grad}</span>
+                </div>
+                {isNext && <span class="next-flag">Sljedeća</span>}
+                {u.status === 'odgodjeno' && <span class="next-flag postp">Odgođeno</span>}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .sch {
+    position: relative;
+    padding: clamp(90px, 12vw, 150px) 0;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(255, 46, 139, 0.25), transparent 35%),
+      radial-gradient(circle at 100% 80%, rgba(227, 36, 43, 0.28), transparent 40%),
+      var(--wine);
+  }
+  .sec-head .stroke { --sc: var(--pink); }
+
+  .part + .part { margin-top: 70px; }
+  .part-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 22px; }
+  .part-head h3 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); }
+  .yr { color: var(--pink); font-size: clamp(1.8rem, 3.5vw, 2.6rem); }
+  .line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255, 184, 214, 0.4), transparent); align-self: center; }
+  .cnt { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pink-soft); }
+
+  .list { display: grid; gap: 12px; list-style: none; }
+  .m {
+    position: relative;
+    display: grid;
+    grid-template-columns: 220px 1fr 230px;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 20px;
+    border-radius: 20px;
+    background: rgba(255, 247, 250, 0.04);
+    border: 1px solid rgba(255, 184, 214, 0.12);
+    transition: background 0.35s, border-color 0.35s, transform 0.35s var(--ease);
+  }
+  .m:hover { background: rgba(255, 46, 139, 0.1); border-color: rgba(255, 46, 139, 0.5); transform: scale(1.01); }
+  .m--next { background: linear-gradient(90deg, rgba(255, 46, 139, 0.25), rgba(255, 46, 139, 0.05)); border-color: var(--pink); }
+  .next-flag {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--pink);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    animation: flag 1.6s ease-in-out infinite;
+  }
+  @keyframes flag { 50% { box-shadow: 0 0 0 6px rgba(255, 46, 139, 0.25); } }
+  .next-flag.postp { background: var(--cream); color: var(--wine); animation: none; }
+
+  .m-date { display: flex; align-items: center; gap: 14px; }
+  .m-kolo { min-width: 64px; font-size: 2.2rem; color: transparent; -webkit-text-stroke: 1.5px var(--pink); line-height: 1; }
+  .m-d { font-weight: 700; font-size: 0.85rem; color: rgba(255, 247, 250, 0.85); }
+
+  .m-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+  .ban {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-family: var(--f-display);
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: var(--wine-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: transform 0.35s var(--ease);
+  }
+  .ban--l { clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%); border-radius: 10px 0 0 10px; }
+  .ban--r { justify-content: flex-end; clip-path: polygon(16px 0, 100% 0, 100% 100%, 0 100%); border-radius: 0 10px 10px 0; }
+  .ban--us { background: linear-gradient(90deg, var(--pink), var(--red)); }
+  .ban--r.ban--us { background: linear-gradient(90deg, var(--red), var(--pink)); }
+  .ban i {
+    font-style: normal;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--wine);
+  }
+  .m:hover .ban--l { transform: translateX(-4px); }
+  .m:hover .ban--r { transform: translateX(4px); }
+  .m-vs { color: var(--pink); font-size: 1.3rem; }
+
+  .m-where { display: flex; align-items: center; gap: 10px; justify-content: flex-end; text-align: right; }
+  .m-place { font-size: 0.8rem; color: rgba(255, 247, 250, 0.7); }
+  .hg { flex: none; padding: 5px 10px; border-radius: 999px; font-size: 0.62rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; border: 1.5px solid rgba(255, 184, 214, 0.5); color: var(--pink-soft); }
+  .hg--d { background: var(--cream); color: var(--wine); border-color: var(--cream); }
+
+  @media (max-width: 1000px) {
+    .m { grid-template-columns: 1fr; gap: 12px; padding: 18px 16px 16px; }
+    .m-where { justify-content: flex-start; text-align: left; }
+  }
+  @media (max-width: 520px) {
+    .ban { font-size: 0.95rem; padding: 8px 10px; gap: 6px; }
+    .ban i { width: 22px; height: 22px; font-size: 0.65rem; }
+    .part-head { flex-wrap: wrap; }
+    .line { display: none; }
+  }
+</style>

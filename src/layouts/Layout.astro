@@ -1,0 +1,139 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="bs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#2b0714" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;700;800;900&family=Caveat:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <div class="progress" aria-hidden="true"></div>
+    <slot />
+
+    <script>
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Reveal na skrol
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      );
+      document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+
+      // Brojači
+      const counterIo = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const el = e.target as HTMLElement;
+          const end = Number(el.dataset.count);
+          const t0 = performance.now();
+          const dur = reduce ? 1 : 1600;
+          const tick = (t: number) => {
+            const p = Math.min((t - t0) / dur, 1);
+            const v = Math.round(end * (1 - Math.pow(1 - p, 4)));
+            el.textContent = v.toLocaleString('bs-BA');
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+          counterIo.unobserve(el);
+        }
+      }, { threshold: 0.6 });
+      document.querySelectorAll('[data-count]').forEach((el) => counterIo.observe(el));
+
+      // Navigacija + traka napretka
+      const nav = document.getElementById('nav');
+      const bar = document.querySelector<HTMLElement>('.progress');
+      const onScroll = () => {
+        const y = window.scrollY;
+        nav?.classList.toggle('scrolled', y > 40);
+        const h = document.documentElement.scrollHeight - innerHeight;
+        if (bar) bar.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+      };
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // 3D nagib kartica
+      if (!reduce && matchMedia('(hover: hover)').matches) {
+        document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
+          const max = Number(card.dataset.tilt) || 10;
+          card.addEventListener('pointermove', (ev) => {
+            const r = card.getBoundingClientRect();
+            const x = (ev.clientX - r.left) / r.width - 0.5;
+            const y = (ev.clientY - r.top) / r.height - 0.5;
+            card.style.setProperty('--rx', `${-y * max}deg`);
+            card.style.setProperty('--ry', `${x * max}deg`);
+            card.style.setProperty('--mx', `${(x + 0.5) * 100}%`);
+            card.style.setProperty('--my', `${(y + 0.5) * 100}%`);
+          });
+          card.addEventListener('pointerleave', () => {
+            card.style.setProperty('--rx', '0deg');
+            card.style.setProperty('--ry', '0deg');
+          });
+        });
+      }
+
+      // Odbrojavanje do sljedeće utakmice
+      document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
+        const target = new Date(el.dataset.countdown + 'T00:00:00').getTime();
+        const parts = {
+          d: el.querySelector('[data-d]'),
+          h: el.querySelector('[data-h]'),
+          m: el.querySelector('[data-m]'),
+          s: el.querySelector('[data-s]'),
+        };
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const update = () => {
+          const diff = Math.max(0, target - Date.now());
+          const d = Math.floor(diff / 864e5);
+          const h = Math.floor((diff % 864e5) / 36e5);
+          const m = Math.floor((diff % 36e5) / 6e4);
+          const s = Math.floor((diff % 6e4) / 1e3);
+          if (parts.d) parts.d.textContent = pad(d);
+          if (parts.h) parts.h.textContent = pad(h);
+          if (parts.m) parts.m.textContent = pad(m);
+          if (parts.s) parts.s.textContent = pad(s);
+        };
+        update();
+        setInterval(update, 1000);
+      });
+    </script>
+
+    <style>
+      .progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--red), var(--pink), var(--pink-soft));
+        transform-origin: left;
+        transform: scaleX(0);
+        z-index: 100;
+      }
+    </style>
+  </body>
+</html>

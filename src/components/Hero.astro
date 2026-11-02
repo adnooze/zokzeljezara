@@ -1,0 +1,294 @@
+---
+import Crest from './Crest.astro';
+import Ball from './Ball.astro';
+import Split from './Split.astro';
+import { klub, igracice, odigrane, pobjede, utakmice } from '../data/klub';
+
+const kapiten = igracice.find((i) => i.kapiten)!;
+const stats = [
+  { n: pobjede, l: 'Pobjeda', s: `u ${odigrane.length} kola` },
+  { n: igracice.length, l: 'Igračica', s: 'u prvoj ekipi' },
+  { n: utakmice.length, l: 'Kola', s: `sezona ${klub.sezona}` },
+  { n: klub.pratilaca, l: 'Navijača', s: 'na Instagramu' },
+];
+---
+
+<section class="hero" id="top">
+  <div class="bg" aria-hidden="true">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="glow g3"></div>
+    <div class="stack">
+      {Array.from({ length: 6 }).map((_, i) => <span class="display" style={`--k:${i}`}>Željezara</span>)}
+    </div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="wrap grid">
+    <div class="copy">
+      <p class="eyebrow chip"><span class="dot"></span>{klub.liga} · Sezona {klub.sezona}</p>
+
+      <h1 class="display title split">
+        <Split text="ŽOK" class="t1" />
+        <Split text="Željezara" class="t2" base={180} />
+        <Split text="Zenica" class="t3 stroke" base={560} />
+      </h1>
+
+      <div class="tagline">
+        <span class="oval pink">zajedno do cilja!</span>
+      </div>
+
+      <p class="lead">
+        Ženski odbojkaški klub iz Zenice. Zajedno na terenu, zajedno do novih bodova —
+        jedan klub, jedna porodica.
+      </p>
+
+      <div class="cta">
+        <a href="#tim" class="btn">Upoznaj ekipu <span class="arr">→</span></a>
+        <a href="#raspored" class="btn btn--ghost">Raspored utakmica</a>
+      </div>
+    </div>
+
+    <div class="visual" aria-hidden="true">
+      <svg class="ring" viewBox="0 0 400 400">
+        <defs>
+          <path id="heroRing" d="M200,200 m-172,0 a172,172 0 1,1 344,0 a172,172 0 1,1 -344,0" />
+        </defs>
+        <text>
+          <textPath href="#heroRing" textLength="1075">GAME DAY ✦ ŽOK ŽELJEZARA ✦ ZENICA ✦ SUPERLIGA FBIH ✦</textPath>
+        </text>
+      </svg>
+      <div class="disc"></div>
+      <Crest size={300} class="crest-big" />
+      <Ball size={130} class="ball" />
+
+      <div class="cap-card">
+        <span class="tape"></span>
+        <span class="cap-num display">{kapiten.broj}</span>
+        <span class="tag">Kapiten</span>
+        <span class="cap-last display">{kapiten.prezime}</span>
+        <span class="cap-first script">{kapiten.ime}</span>
+      </div>
+
+      <div class="sticker">
+        <b class="display">{pobjede}</b>
+        <span>pobjeda<br />u {odigrane.length} kola</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <ul class="stats">
+      {stats.map((s, i) => (
+        <li data-reveal style={`--d:${i * 0.1}s`}>
+          <b class="display" data-count={s.n}>0</b>
+          <span><strong>{s.l}</strong>{s.s}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    padding: 130px 0 50px;
+    display: grid;
+    align-content: center;
+    gap: 50px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* --- pozadina --- */
+  .bg { position: absolute; inset: 0; z-index: -1; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.75; animation: drift 14s ease-in-out infinite alternate; }
+  .g1 { width: 55vw; height: 55vw; background: var(--red); top: -20vw; right: -12vw; }
+  .g2 { width: 40vw; height: 40vw; background: var(--pink); bottom: -18vw; left: -10vw; animation-delay: -5s; }
+  .g3 { width: 26vw; height: 26vw; background: #ff7cc0; top: 30%; left: 42%; opacity: 0.35; animation-delay: -9s; }
+  @keyframes drift {
+    to { transform: translate(6vw, 4vw) scale(1.15); }
+  }
+  .stack {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    opacity: 0.11;
+    transform: rotate(-8deg) scale(1.2);
+  }
+  .stack span {
+    font-size: 19vw;
+    line-height: 0.82;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--pink-soft);
+    animation: slide 30s linear infinite;
+    animation-direction: var(--dir, normal);
+    transform: translateX(calc(var(--k) * -9%));
+  }
+  .stack span:nth-child(even) { --dir: reverse; }
+  @keyframes slide {
+    from { translate: -10% 0; }
+    to { translate: 10% 0; }
+  }
+  .grain {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 4px 4px;
+    mix-blend-mode: overlay;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: 40px;
+  }
+
+  /* --- tekst --- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(255, 247, 250, 0.08);
+    border: 1px solid rgba(255, 184, 214, 0.25);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    animation: fade 0.8s var(--ease) 0.1s forwards;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 0 var(--pink); animation: ping 1.8s infinite; }
+  @keyframes ping {
+    70% { box-shadow: 0 0 0 10px rgba(255, 46, 139, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 46, 139, 0); }
+  }
+  .title { margin: 22px 0 6px; font-size: clamp(3.4rem, 9.2vw, 8.6rem); }
+  .title :global(.t1) { font-size: 0.5em; color: var(--pink-soft); }
+  .title :global(.t2) { color: #fff; text-shadow: 0 10px 40px rgba(227, 36, 43, 0.45); }
+  .title :global(.t3) { --sc: var(--pink); --sw: 2px; }
+
+  .tagline { margin: 6px 0 22px 4px; opacity: 0; animation: pop 0.8s var(--ease) 1.1s forwards; }
+  .lead { max-width: 46ch; font-size: 1.08rem; opacity: 0; animation: fade 0.9s var(--ease) 1.2s forwards; color: rgba(255, 247, 250, 0.85); }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; opacity: 0; animation: fade 0.9s var(--ease) 1.35s forwards; }
+  @keyframes fade { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { opacity: 0; transform: scale(0.6) rotate(-12deg); } to { opacity: 1; transform: none; } }
+
+  /* --- vizual --- */
+  .visual { position: relative; aspect-ratio: 1; width: min(100%, 520px); justify-self: center; display: grid; place-items: center; }
+  .ring { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 26s linear infinite; }
+  .ring text { fill: var(--pink-soft); font: 800 21px var(--f-body); letter-spacing: 3px; }
+  .disc {
+    position: absolute;
+    inset: 16%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--pink), var(--red), var(--wine-3), var(--pink));
+    animation: spin 12s linear infinite reverse;
+    filter: blur(2px);
+    opacity: 0.55;
+  }
+  @keyframes spin { to { rotate: 360deg; } }
+  .visual :global(.crest-big) {
+    position: relative;
+    width: 58%;
+    height: auto;
+    filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.45));
+    animation: crestIn 1.2s var(--ease) 0.3s both, bob 6s ease-in-out 1.5s infinite;
+  }
+  @keyframes crestIn { from { opacity: 0; transform: scale(0.4) rotate(-90deg); } }
+  @keyframes bob { 50% { translate: 0 -12px; } }
+  .visual :global(.ball) {
+    position: absolute;
+    right: 2%;
+    top: 4%;
+    width: 24%;
+    height: auto;
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.4));
+    animation: ballIn 1.1s var(--ease) 0.7s both, ballFloat 4.5s ease-in-out 1.8s infinite;
+  }
+  @keyframes ballIn { from { opacity: 0; transform: translate(80px, -120px) rotate(-200deg); } }
+  @keyframes ballFloat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-18px) rotate(40deg); }
+  }
+
+  .cap-card {
+    position: absolute;
+    left: -2%;
+    bottom: 6%;
+    width: 46%;
+    padding: 18px 18px 16px;
+    background: linear-gradient(160deg, var(--pink) 0%, #d1006a 100%);
+    border-radius: 18px;
+    transform: rotate(-7deg);
+    box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.6);
+    display: grid;
+    justify-items: start;
+    overflow: hidden;
+    animation: cardIn 1s var(--ease) 1s both;
+  }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(60px) rotate(-20deg); } }
+  .cap-num { position: absolute; right: 8px; top: -6px; font-size: 6.2rem; color: rgba(255, 255, 255, 0.22); line-height: 1; }
+  .cap-last { font-size: clamp(1.6rem, 3vw, 2.3rem); margin-top: 10px; color: #fff; }
+  .cap-first { font-size: 1.5rem; color: var(--wine); margin-top: -2px; }
+  .tape {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: 70px;
+    height: 22px;
+    translate: -50% 0;
+    rotate: 4deg;
+    background: rgba(255, 247, 250, 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  .sticker {
+    position: absolute;
+    right: 0;
+    bottom: 14%;
+    width: 128px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--wine);
+    display: grid;
+    place-content: center;
+    text-align: center;
+    rotate: 12deg;
+    box-shadow: 0 0 0 6px rgba(255, 247, 250, 0.2);
+    animation: pop 0.8s var(--ease) 1.4s both;
+  }
+  .sticker b { font-size: 3rem; color: var(--red); line-height: 0.9; }
+  .sticker span { font-weight: 800; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.2; }
+
+  /* --- statistika --- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(255, 184, 214, 0.2);
+  }
+  .stats li { display: flex; align-items: center; gap: 14px; padding: 22px 18px 0 0; }
+  .stats li + li { padding-left: 22px; border-left: 1px solid rgba(255, 184, 214, 0.2); }
+  .stats b { font-size: clamp(2.4rem, 4.5vw, 3.6rem); color: var(--pink); line-height: 1; }
+  .stats span { display: grid; font-size: 0.8rem; color: rgba(255, 247, 250, 0.7); line-height: 1.3; }
+  .stats strong { color: #fff; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.78rem; }
+
+  @media (max-width: 900px) {
+    .hero { padding-top: 110px; }
+    .grid { grid-template-columns: 1fr; }
+    .visual { width: min(100%, 420px); }
+    .stats { grid-template-columns: repeat(2, 1fr); row-gap: 20px; }
+    .stats li:nth-child(3) { padding-left: 0; border-left: 0; }
+  }
+  @media (max-width: 520px) {
+    .sticker { width: 98px; }
+    .sticker b { font-size: 2.2rem; }
+    .cap-card { width: 54%; padding: 14px; }
+    .cap-num { font-size: 4.4rem; }
+    .stats li { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Team from '../components/Team.astro';
+import GameDay from '../components/GameDay.astro';
+import Results from '../components/Results.astro';
+import Schedule from '../components/Schedule.astro';
+import Karte from '../components/Karte.astro';
+import Kontakt from '../components/Kontakt.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="ŽOK Željezara Zenica — Ženski odbojkaški klub"
+  description="Službena stranica ŽOK „Željezara“ Zenica — Superliga FBiH, Grupa Jug. Upoznaj ekipu, rezultati, raspored utakmica i članske karte."
+>
+  <Nav />
+  <main>
+    <Hero />
+    <div class="strips">
+      <Marquee items={['Game day', 'ŽOK Željezara', 'Zajedno na terenu', 'Zenica', 'Superliga FBiH']} tilt={-2} />
+      <Marquee items={['Jedan klub', 'Jedna porodica', '#zokice', 'Sezona 2026/27']} variant="red" reverse tilt={1.5} />
+    </div>
+    <Team />
+    <GameDay />
+    <Results />
+    <Marquee items={['Vidimo se na utakmicama', 'Prva gimnazija', 'Zenica', 'Podrži naše djevojke']} variant="cream" />
+    <Schedule />
+    <Karte />
+    <Kontakt />
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .strips { position: relative; z-index: 4; margin: -30px 0 -40px; display: grid; gap: 0; }
+</style>

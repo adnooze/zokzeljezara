@@ -1,0 +1,158 @@
+---
+import Crest from './Crest.astro';
+import { odigrane, pobjede, porazi, inicijali, klub } from '../data/klub';
+
+const lista = [...odigrane].reverse();
+const ZOK = 'ŽOK „Željezara“';
+const bezRezultata = odigrane.length - pobjede - porazi;
+---
+
+<section class="res" id="rezultati">
+  <div class="wrap">
+    <header class="sec-head head">
+      <div>
+        <p class="eyebrow red" data-reveal>Superliga FBiH · {klub.sezona}</p>
+        <h2 class="display" data-reveal style="--d:.08s">Završene <span class="pink">utakmice</span></h2>
+      </div>
+
+      <div class="form" data-reveal="right">
+        <p class="eyebrow">Forma</p>
+        <ol>
+          {odigrane.map((u, i) => (
+            <li class={`f f--${u.ishod ?? 'na'}`} style={`--i:${i}`} title={`${u.kolo}. kolo · ${u.protivnik}`}>
+              {u.ishod === 'pobjeda' ? 'W' : u.ishod === 'poraz' ? 'L' : '–'}
+            </li>
+          ))}
+        </ol>
+        <p class="summary">
+          <b data-count={pobjede}>0</b> pobjeda · <b data-count={porazi}>0</b> {porazi === 1 ? 'poraz' : 'poraza'}
+          {bezRezultata > 0 && <span> · {bezRezultata} bez unesenog rezultata</span>}
+        </p>
+      </div>
+    </header>
+
+    <div class="cards">
+      {lista.map((u, i) => {
+        const [h, a] = (u.rezultat ?? '').split(':');
+        const home = u.domaci ? ZOK : u.protivnik;
+        const away = u.domaci ? u.protivnik : ZOK;
+        return (
+          <article class={`rc rc--${u.ishod ?? 'na'}`} data-reveal style={`--d:${(i % 3) * 0.08}s`}>
+            <span class="rc-kolo display" aria-hidden="true">{u.kolo}</span>
+            <div class="rc-top">
+              <span class="eyebrow">{u.kolo}. kolo</span>
+              <span class="badge">{u.ishod === 'pobjeda' ? 'Pobjeda' : u.ishod === 'poraz' ? 'Poraz' : 'Rezultat uskoro'}</span>
+            </div>
+            <ul class="rc-teams">
+              {[[home, h], [away, a]].map(([name, score]) => (
+                <li class={name === ZOK ? 'us' : ''}>
+                  {name === ZOK ? <Crest size={34} /> : <span class="mini">{inicijali(name!)}</span>}
+                  <span class="nm">{name}</span>
+                  <b class="display">{score || ''}</b>
+                </li>
+              ))}
+            </ul>
+            {u.setovi && <p class="sets">Setovi: {u.setovi.join(' · ')}</p>}
+            <p class="rc-meta">
+              {u.datum}{u.vrijeme ? ` · ${u.vrijeme}` : ''} · {u.domaci ? 'Domaćin' : 'Gost'}
+            </p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .res {
+    position: relative;
+    padding: clamp(90px, 12vw, 150px) 0;
+    background: var(--cream);
+    color: var(--wine);
+    overflow: hidden;
+  }
+  .res::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 95% 10%, rgba(255, 46, 139, 0.16), transparent 35%),
+      radial-gradient(circle at 0% 100%, rgba(227, 36, 43, 0.1), transparent 40%);
+    pointer-events: none;
+  }
+  .head { grid-template-columns: 1fr auto; align-items: end; gap: 30px; position: relative; }
+  .head .display { color: var(--wine); }
+
+  .form { padding: 20px 22px; border-radius: 22px; background: #fff; box-shadow: 0 20px 50px -30px rgba(87, 17, 41, 0.4); }
+  .form .eyebrow { color: var(--red); margin-bottom: 10px; }
+  .form ol { display: flex; gap: 8px; list-style: none; }
+  .f {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 0.85rem;
+    opacity: 0;
+    animation: fpop 0.5s var(--ease) forwards;
+    animation-delay: calc(var(--i) * 90ms + 0.4s);
+  }
+  :global(.js) .form:not(:global(.in)) .f { animation-play-state: paused; }
+  @keyframes fpop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
+  .f--pobjeda { background: var(--pink); color: #fff; }
+  .f--poraz { background: var(--wine); color: #fff; }
+  .f--na { border: 2px dashed var(--pink-soft); color: var(--pink); }
+  .summary { margin-top: 12px; font-size: 0.85rem; }
+  .summary b { font-size: 1.05rem; color: var(--pink); }
+  .summary span { opacity: 0.6; }
+
+  .cards { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .rc {
+    position: relative;
+    padding: 22px;
+    border-radius: 24px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 24px 50px -34px rgba(87, 17, 41, 0.45);
+    transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease);
+    border-top: 6px solid var(--accent, var(--pink-soft));
+  }
+  .rc:hover { transform: translateY(-8px) rotate(-0.6deg); box-shadow: 0 34px 60px -30px rgba(255, 46, 139, 0.55); }
+  .rc--pobjeda { --accent: var(--pink); }
+  .rc--poraz { --accent: var(--wine); }
+  .rc-kolo {
+    position: absolute;
+    right: 10px;
+    bottom: -18px;
+    font-size: 7.5rem;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--blush);
+    transition: -webkit-text-stroke-color 0.4s;
+    pointer-events: none;
+  }
+  .rc:hover .rc-kolo { -webkit-text-stroke-color: var(--pink-soft); }
+  .rc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .rc-top .eyebrow { color: var(--red); }
+  .badge { padding: 5px 12px; border-radius: 999px; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; background: var(--accent); color: #fff; }
+  .rc--na .badge { color: var(--pink); background: var(--blush); }
+
+  .rc-teams { position: relative; display: grid; gap: 8px; }
+  .rc-teams li { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 14px; background: var(--blush); }
+  .rc-teams li.us { background: linear-gradient(90deg, rgba(255, 46, 139, 0.18), var(--blush)); }
+  .mini { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--wine); color: #fff; font-family: var(--f-display); font-size: 0.95rem; flex: none; }
+  .nm { flex: 1; font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .rc-teams b { font-size: 1.8rem; line-height: 1; }
+  .sets { position: relative; margin-top: 12px; font-size: 0.8rem; font-weight: 700; color: var(--red); }
+  .rc-meta { position: relative; margin-top: 12px; font-size: 0.8rem; opacity: 0.65; }
+
+  @media (max-width: 1000px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .head { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .cards { grid-template-columns: 1fr; }
+    .f { width: 32px; height: 32px; }
+  }
+</style>

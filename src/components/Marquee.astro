@@ -1,0 +1,44 @@
+---
+interface Props {
+  items: string[];
+  variant?: 'pink' | 'red' | 'cream';
+  reverse?: boolean;
+  tilt?: number;
+}
+const { items, variant = 'pink', reverse = false, tilt = 0 } = Astro.props;
+---
+
+<div class={`mq mq--${variant}`} style={`--tilt:${tilt}deg`} aria-hidden="true">
+  <div class={`track ${reverse ? 'rev' : ''}`}>
+    {[0, 1].map(() => (
+      <div class="group">
+        {items.map((t) => (
+          <span class="item display">{t}<i>✦</i></span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .mq {
+    position: relative;
+    z-index: 3;
+    overflow: hidden;
+    padding: 16px 0;
+    margin-inline: -4vw;
+    rotate: var(--tilt);
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+  }
+  .mq--pink { background: var(--pink); color: #fff; }
+  .mq--red { background: var(--red); color: #fff; }
+  .mq--cream { background: var(--cream); color: var(--wine); }
+  .track { display: flex; width: max-content; animation: run 28s linear infinite; }
+  .track.rev { animation-direction: reverse; }
+  .mq:hover .track { animation-play-state: paused; }
+  .group { display: flex; }
+  .item { display: inline-flex; align-items: center; gap: 28px; padding-right: 28px; font-size: clamp(1.6rem, 3.4vw, 2.6rem); white-space: nowrap; }
+  .item i { font-style: normal; font-size: 0.6em; opacity: 0.75; }
+  .mq--cream .item i { color: var(--pink); }
+  @keyframes run { to { transform: translateX(-50%); } }
+</style>

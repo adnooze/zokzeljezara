@@ -1,0 +1,16 @@
+# zavisnosti i build
+node_modules/
+dist/
+.astro/
+
+# lokalni alati
+.wrangler/
+.claude/
+.impeccable/
+
+# sistem
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*

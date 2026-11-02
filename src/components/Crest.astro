@@ -1,0 +1,47 @@
+---
+// Grb kluba. Ako postoji originalni logo u /public/logo.png, koristi se on;
+// u suprotnom se crta SVG verzija po uzoru na logo.
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+interface Props { size?: number; class?: string }
+const { size = 56, class: cls = '' } = Astro.props;
+const imaLogo = existsSync(join(process.cwd(), 'public', 'logo.png'));
+const id = 'cr' + Math.random().toString(36).slice(2, 8);
+---
+
+{imaLogo ? (
+  <img class={`crest ${cls}`} src="/logo.png" width={size} height={size} alt="Grb ŽOK Željezara Zenica" />
+) : (
+  <svg class={`crest ${cls}`} width={size} height={size} viewBox="0 0 200 200" role="img" aria-label="Grb ŽOK Željezara Zenica">
+    <defs>
+      <clipPath id={`${id}s`}>
+        <path d="M52 84h96v42c0 24-20 40-48 50-28-10-48-26-48-50z" />
+      </clipPath>
+    </defs>
+    <circle cx="100" cy="100" r="99" fill="#e8353a" />
+    <g fill="#fff" font-family="Archivo, Arial, sans-serif" font-weight="900" text-anchor="middle">
+      <text x="100" y="50" font-size="21" letter-spacing="0.5">ŽENSKI</text>
+      <text x="100" y="72" font-size="16.5" letter-spacing="0.2">ODBOJKAŠKI KLUB</text>
+    </g>
+    <path d="M52 84h96v42c0 24-20 40-48 50-28-10-48-26-48-50z" fill="#e8353a" />
+    <g clip-path={`url(#${id}s)`}>
+      <g stroke="#fff" stroke-width="1.6" opacity="0.9">
+        <path d="M52 94h96M52 104h96M52 114h96M52 124h96M52 134h96" />
+        <path d="M62 84v60M72 84v60M82 84v60M92 84v60M102 84v60M112 84v60M122 84v60M132 84v60M142 84v60" />
+      </g>
+      <path
+        d="M52 182v-36h8v-22h7v22h10v-10h10v10h9v-16h8v16h10v-12h9v12h9v-24h7v24h11v36z"
+        fill="#14030a"
+      />
+    </g>
+    <path d="M52 84h96v42c0 24-20 40-48 50-28-10-48-26-48-50z" fill="none" stroke="#14030a" stroke-width="4" />
+    <circle cx="100" cy="112" r="25" fill="#fff" stroke="#14030a" stroke-width="2.5" />
+    <rect x="72" y="100" width="56" height="22" rx="3" fill="#fff" stroke="#14030a" stroke-width="2" />
+    <g fill="#14030a" font-family="Archivo, Arial, sans-serif" font-weight="900" text-anchor="middle">
+      <text x="100" y="110" font-size="9">ŽELJEZARA</text>
+      <text x="100" y="119.5" font-size="9">ZENICA</text>
+    </g>
+    <path d="M84 94c10 2 22 2 32 0M84 130c10-2 22-2 32 0" fill="none" stroke="#14030a" stroke-width="2" />
+  </svg>
+)}

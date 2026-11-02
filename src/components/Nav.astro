@@ -1,0 +1,122 @@
+---
+import Crest from './Crest.astro';
+const links = [
+  ['#tim', 'Tim'],
+  ['#utakmica', 'Game day'],
+  ['#rezultati', 'Rezultati'],
+  ['#raspored', 'Raspored'],
+  ['#karte', 'Članske karte'],
+  ['#kontakt', 'Kontakt'],
+];
+---
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="brand" aria-label="ŽOK Željezara — početak">
+      <Crest size={46} class="brand-crest" />
+      <span class="brand-t">
+        <b>ŽOK Željezara</b>
+        <small>Zenica · Superliga FBiH</small>
+      </span>
+    </a>
+
+    <nav class="links" id="menu" aria-label="Glavna navigacija">
+      {links.map(([href, label]) => <a href={href}>{label}</a>)}
+      <a href="#utakmica" class="btn nav-cta">Sljedeća utakmica <span class="arr">→</span></a>
+    </nav>
+
+    <button class="burger" aria-label="Otvori meni" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<script>
+  const burger = document.querySelector<HTMLButtonElement>('.burger');
+  const menu = document.getElementById('menu');
+  burger?.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') !== 'true';
+    burger.setAttribute('aria-expanded', String(open));
+    menu?.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  menu?.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      burger?.setAttribute('aria-expanded', 'false');
+      menu.classList.remove('open');
+      document.body.style.overflow = '';
+    })
+  );
+</script>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    padding: 14px 0;
+    transition: background 0.4s var(--ease), backdrop-filter 0.4s, box-shadow 0.4s;
+  }
+  .nav:global(.scrolled) {
+    background: rgba(43, 7, 20, 0.78);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 1px 0 rgba(255, 184, 214, 0.12);
+  }
+  .nav-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand :global(.brand-crest) { transition: transform 0.6s var(--ease); }
+  .brand:hover :global(.brand-crest) { transform: rotate(-12deg) scale(1.06); }
+  .brand-t { display: grid; line-height: 1.1; }
+  .brand-t b { font-family: var(--f-display); font-weight: 400; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 0.02em; }
+  .brand-t small { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pink-soft); font-weight: 700; }
+
+  .links { display: flex; align-items: center; gap: 26px; }
+  .links a:not(.btn) {
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    position: relative;
+    padding: 6px 0;
+  }
+  .links a:not(.btn)::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: var(--pink);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s var(--ease);
+  }
+  .links a:not(.btn):hover::after { transform: scaleX(1); transform-origin: left; }
+  .nav-cta { padding: 11px 18px; font-size: 0.72rem; }
+
+  .burger { display: none; width: 46px; height: 46px; border-radius: 50%; background: var(--pink); position: relative; z-index: 2; }
+  .burger span { position: absolute; left: 13px; right: 13px; height: 2px; background: #fff; transition: transform 0.35s var(--ease), top 0.35s var(--ease); }
+  .burger span:first-child { top: 18px; }
+  .burger span:last-child { top: 26px; }
+  .burger[aria-expanded='true'] span:first-child { top: 22px; transform: rotate(45deg); }
+  .burger[aria-expanded='true'] span:last-child { top: 22px; transform: rotate(-45deg); }
+
+  @media (max-width: 1080px) {
+    .links a:not(.btn) { font-size: 0.72rem; }
+    .links { gap: 18px; }
+  }
+  .links a { white-space: nowrap; }
+  @media (max-width: 1120px) {
+    .burger { display: block; }
+    .links {
+      position: fixed;
+      inset: 0;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      background: radial-gradient(circle at 80% 10%, var(--pink) 0, transparent 45%), var(--wine);
+      clip-path: circle(0 at calc(100% - 40px) 40px);
+      transition: clip-path 0.7s var(--ease);
+    }
+    .links:global(.open) { clip-path: circle(150% at calc(100% - 40px) 40px); }
+    .links a:not(.btn) { font-family: var(--f-display); font-weight: 400; font-size: 2.6rem; letter-spacing: 0.02em; }
+  }
+</style>

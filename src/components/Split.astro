@@ -1,0 +1,10 @@
+---
+// Razbija tekst na slova koja se animirano podižu (vidi .split u global.css)
+interface Props { text: string; base?: number; class?: string }
+const { text, base = 0, class: cls = '' } = Astro.props;
+const chars = [...text];
+---
+
+<span class={`line ${cls}`} aria-label={text} style={`--base:${base}ms`}>
+  {chars.map((c, i) => <span class="ch" aria-hidden="true" style={`--i:${i}`}>{c === ' ' ? ' ' : c}</span>)}
+</span>
