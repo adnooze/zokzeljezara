@@ -14,3 +14,6 @@ Thumbs.db
 *.log
 .env
 .env.*
+
+# originalni video (prevelik za git)
+izvor-slike/reel/
